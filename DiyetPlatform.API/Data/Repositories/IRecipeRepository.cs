@@ -23,5 +23,8 @@ namespace DiyetPlatform.API.Data.Repositories
         Task AddCommentAsync(Comment comment);
         Task AddRecipeCategoryAsync(RecipeCategory recipeCategory);
         void DeleteRecipeCategory(RecipeCategory recipeCategory);
+        Task AddCategoryAsync(Category category);
+        void UpdateCategory(Category category);
+        void DeleteCategory(Category category);
     }
 }

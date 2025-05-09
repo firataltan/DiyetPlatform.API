@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DiyetPlatform.API.Models.DTOs;
 using DiyetPlatform.API.Models.DTOs.Auth;
+using DiyetPlatform.API.Models.DTOs.Category;
 using DiyetPlatform.API.Models.DTOs.DietPlan;
 using DiyetPlatform.API.Models.DTOs.Post;
 using DiyetPlatform.API.Models.DTOs.Recipe;
@@ -109,6 +110,11 @@ namespace DiyetPlatform.API.Helpers
                     opt.MapFrom((src, dest, destMember, context) => 
                         context.Items.ContainsKey("currentUserId") && 
                         src.Likes.Any(l => l.UserId == (int)context.Items["currentUserId"])));
+
+            // Category mappings
+            CreateMap<CategoryCreateDto, Category>();
+            CreateMap<CategoryUpdateDto, Category>();
+            CreateMap<Category, CategoryResponseDto>();
         }
     }
 }

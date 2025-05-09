@@ -195,5 +195,20 @@ namespace DiyetPlatform.API.Data.Repositories
         {
             _context.RecipeCategories.Remove(recipeCategory);
         }
+
+        public async Task AddCategoryAsync(Category category)
+        {
+            await _context.Categories.AddAsync(category);
+        }
+
+        public void UpdateCategory(Category category)
+        {
+            _context.Categories.Update(category);
+        }
+
+        public void DeleteCategory(Category category)
+        {
+            _context.Categories.Remove(category);
+        }
     }
 }
