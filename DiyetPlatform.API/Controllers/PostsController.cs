@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using DiyetPlatform.API.Models.DTOs.Post;
-using DiyetPlatform.API.Services;
-using DiyetPlatform.API.Helpers;
+using DiyetPlatform.Application.DTOs.Post;
+using DiyetPlatform.Application.Interfaces;
+using DiyetPlatform.Core.Common;
 
 namespace DiyetPlatform.API.Controllers
 {
@@ -18,7 +18,7 @@ namespace DiyetPlatform.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetPosts([FromQuery] PostParams postParams)
+        public async Task<IActionResult> GetPosts([FromQuery] DiyetPlatform.Core.Common.PostParams postParams)
         {
             var posts = await _postService.GetPostsAsync(postParams);
             return Ok(posts);
@@ -36,7 +36,7 @@ namespace DiyetPlatform.API.Controllers
         }
 
         [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetUserPosts(int userId, [FromQuery] PostParams postParams)
+        public async Task<IActionResult> GetUserPosts(int userId, [FromQuery] DiyetPlatform.Core.Common.PostParams postParams)
         {
             var posts = await _postService.GetUserPostsAsync(userId, postParams);
             return Ok(posts);
@@ -44,7 +44,7 @@ namespace DiyetPlatform.API.Controllers
 
         [Authorize]
         [HttpGet("feed")]
-        public async Task<IActionResult> GetFeed([FromQuery] PostParams postParams)
+        public async Task<IActionResult> GetFeed([FromQuery] DiyetPlatform.Core.Common.PostParams postParams)
         {
             var userId = int.Parse(User.FindFirst("userId")?.Value ?? "0");
             var posts = await _postService.GetUserFeedAsync(userId, postParams);
@@ -56,9 +56,12 @@ namespace DiyetPlatform.API.Controllers
         public async Task<IActionResult> CreatePost([FromForm] PostCreateDto postDto)
         {
             var userId = int.Parse(User.FindFirst("userId")?.Value ?? "0");
-            var post = await _postService.CreatePostAsync(userId, postDto);
+            var response = await _postService.CreatePostAsync(userId, postDto);
 
-            return CreatedAtAction(nameof(GetPost), new { id = post.Id }, post);
+            if (!response.Success)
+                return BadRequest(response.Message);
+
+            return CreatedAtAction(nameof(GetPost), new { id = response.Data.Id }, response.Data);
         }
 
         [Authorize]
@@ -127,7 +130,7 @@ namespace DiyetPlatform.API.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<IActionResult> SearchPosts([FromQuery] string query, [FromQuery] PostParams postParams)
+        public async Task<IActionResult> SearchPosts([FromQuery] string query, [FromQuery] DiyetPlatform.Core.Common.PostParams postParams)
         {
             var posts = await _postService.SearchPostsAsync(query, postParams);
             return Ok(posts);

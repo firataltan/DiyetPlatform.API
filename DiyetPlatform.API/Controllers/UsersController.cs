@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using DiyetPlatform.API.Models.DTOs.User;
-using DiyetPlatform.API.Services;
-using DiyetPlatform.API.Helpers;
+using DiyetPlatform.Application.DTOs.User;
+using DiyetPlatform.Application.Interfaces;
+using DiyetPlatform.Application.Common.Parameters;
 
 namespace DiyetPlatform.API.Controllers
 {
@@ -39,7 +39,7 @@ namespace DiyetPlatform.API.Controllers
         [HttpGet("profile")]
         public async Task<IActionResult> GetCurrentUser()
         {
-            var userId = int.Parse(User.FindFirst("userId")?.Value);
+            var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
             var user = await _userService.GetUserByIdAsync(userId);
 
             if (user == null)
@@ -52,8 +52,8 @@ namespace DiyetPlatform.API.Controllers
         [HttpPut("profile")]
         public async Task<IActionResult> UpdateProfile([FromForm] ProfileUpdateDto profileDto)
         {
-            var userId = int.Parse(User.FindFirst("userId")?.Value);
-            var result = await _userService.UpdateProfileAsync(userId, profileDto);
+            var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
+            var result = await _userService.UpdateUserAsync(userId, profileDto);
 
             if (!result.Success)
                 return BadRequest(result.Message);
@@ -65,7 +65,7 @@ namespace DiyetPlatform.API.Controllers
         [HttpPost("follow/{targetId}")]
         public async Task<IActionResult> FollowUser(int targetId)
         {
-            var userId = int.Parse(User.FindFirst("userId")?.Value);
+            var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
 
             if (userId == targetId)
                 return BadRequest("Kendinizi takip edemezsiniz.");
@@ -82,7 +82,7 @@ namespace DiyetPlatform.API.Controllers
         [HttpPost("unfollow/{targetId}")]
         public async Task<IActionResult> UnfollowUser(int targetId)
         {
-            var userId = int.Parse(User.FindFirst("userId")?.Value);
+            var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
             var result = await _userService.UnfollowUserAsync(userId, targetId);
 
             if (!result.Success)
@@ -94,22 +94,28 @@ namespace DiyetPlatform.API.Controllers
         [HttpGet("{id}/followers")]
         public async Task<IActionResult> GetUserFollowers(int id, [FromQuery] UserParams userParams)
         {
-            var followers = await _userService.GetUserFollowersAsync(id, userParams);
+            var followers = await _userService.GetFollowersAsync(id, userParams);
             return Ok(followers);
         }
 
         [HttpGet("{id}/following")]
         public async Task<IActionResult> GetUserFollowing(int id, [FromQuery] UserParams userParams)
         {
-            var following = await _userService.GetUserFollowingAsync(id, userParams);
+            var following = await _userService.GetFollowingAsync(id, userParams);
             return Ok(following);
         }
 
-        [HttpGet("search")]
-        public async Task<IActionResult> SearchUsers([FromQuery] string query, [FromQuery] UserParams userParams)
+        [Authorize]
+        [HttpDelete("account")]
+        public async Task<IActionResult> DeleteAccount()
         {
-            var users = await _userService.SearchUsersAsync(query, userParams);
-            return Ok(users);
+            var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
+            var result = await _userService.DeleteUserAsync(userId);
+
+            if (!result.Success)
+                return BadRequest(result.Message);
+
+            return Ok(result);
         }
     }
 }

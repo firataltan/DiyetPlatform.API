@@ -1,8 +1,10 @@
-using DiyetPlatform.API.Data;
 using DiyetPlatform.API.Extensions;
 using DiyetPlatform.API.Middlewares;
-using Microsoft.EntityFrameworkCore;
+using DiyetPlatform.Application;
+using DiyetPlatform.Infrastructure;
 using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +15,6 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Diyet Platform API", Version = "v1" });
     
-    // JWT Authentication için security tanımı
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
@@ -39,18 +40,17 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Database context
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// Application services
+// Add Application Layer Services
 builder.Services.AddApplicationServices(builder.Configuration);
+
+// Add Infrastructure Layer Services
+builder.Services.AddInfrastructureServices(builder.Configuration);
 
 // Authentication services
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
 // Add MassTransit
-builder.Services.AddMassTransitServices(builder.Configuration);
+// builder.Services.AddMassTransitServices(builder.Configuration);
 
 // CORS policy
 builder.Services.AddCors(options =>
@@ -89,19 +89,18 @@ app.UseJwtMiddleware();
 
 app.MapControllers();
 
-// Ensure database is created and migrations are applied
+// Apply database migrations
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
-        var context = services.GetRequiredService<ApplicationDbContext>();
-        context.Database.Migrate();
+        await DiyetPlatform.Infrastructure.DependencyInjection.ApplyMigrationsAsync(services);
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred during migration");
+        logger.LogError(ex, "An error occurred while migrating the database.");
     }
 }
 

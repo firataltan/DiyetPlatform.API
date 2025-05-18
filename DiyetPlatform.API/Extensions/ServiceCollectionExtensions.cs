@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using DiyetPlatform.API.Services;
+using DiyetPlatform.Application;
 
 namespace DiyetPlatform.API.Extensions
 {
@@ -7,11 +7,8 @@ namespace DiyetPlatform.API.Extensions
     {
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
-            services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IPostService, PostService>();
-            services.AddScoped<IRecipeService, RecipeService>();
-            services.AddScoped<ICategoryService, CategoryService>();
-            services.AddScoped<INotificationService, NotificationService>();
+            // Use the Application layer's DependencyInjection to register services
+            services.AddApplicationServices();
             return services;
         }
     }

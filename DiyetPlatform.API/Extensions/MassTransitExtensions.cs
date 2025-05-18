@@ -1,4 +1,3 @@
-using DiyetPlatform.API.Consumers;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,12 +6,12 @@ namespace DiyetPlatform.API.Extensions
 {
     public static class MassTransitExtensions
     {
-        public static IServiceCollection AddMassTransitServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection ConfigureMassTransit(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddMassTransit(x =>
             {
                 // Register consumers
-                x.AddConsumer<UserCreatedEventConsumer>();
+                // x.AddConsumer<UserCreatedEventConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
                 {

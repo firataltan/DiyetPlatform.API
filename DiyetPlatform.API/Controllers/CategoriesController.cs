@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using DiyetPlatform.API.Services;
-using DiyetPlatform.API.Models.DTOs.Category;
+using DiyetPlatform.Application.Interfaces;
+using DiyetPlatform.Application.DTOs.Category;
+using DiyetPlatform.Application.Common.Parameters;
 
 namespace DiyetPlatform.API.Controllers
 {
@@ -17,9 +18,10 @@ namespace DiyetPlatform.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCategories()
+        public async Task<IActionResult> GetCategories([FromQuery] CategoryParams categoryParams = null)
         {
-            var categories = await _categoryService.GetCategoriesAsync();
+            categoryParams ??= new CategoryParams();
+            var categories = await _categoryService.GetCategoriesAsync(categoryParams);
             return Ok(categories);
         }
 

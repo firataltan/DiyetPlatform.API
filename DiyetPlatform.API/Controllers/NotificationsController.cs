@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using DiyetPlatform.API.Helpers;
-using DiyetPlatform.API.Services;
-using DiyetPlatform.API.Models;
+using DiyetPlatform.Application.Interfaces;
+using DiyetPlatform.Application.Common.Parameters;
 
 namespace DiyetPlatform.API.Controllers
 {

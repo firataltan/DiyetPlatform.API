@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using DiyetPlatform.API.Helpers;
-using DiyetPlatform.API.Services;
+using DiyetPlatform.Application.Interfaces;
+using DiyetPlatform.Application.Common.Parameters;
+using DiyetPlatform.Core.Common;
 
 namespace DiyetPlatform.API.Controllers
 {
@@ -23,21 +24,21 @@ namespace DiyetPlatform.API.Controllers
         }
 
         [HttpGet("users")]
-        public async Task<IActionResult> SearchUsers([FromQuery] string query, [FromQuery] UserParams userParams)
+        public async Task<IActionResult> SearchUsers([FromQuery] string query, [FromQuery] DiyetPlatform.Core.Common.UserParams userParams)
         {
             var users = await _searchService.SearchUsersAsync(query, userParams);
             return Ok(users);
         }
 
         [HttpGet("posts")]
-        public async Task<IActionResult> SearchPosts([FromQuery] string query, [FromQuery] PostParams postParams)
+        public async Task<IActionResult> SearchPosts([FromQuery] string query, [FromQuery] DiyetPlatform.Core.Common.PostParams postParams)
         {
             var posts = await _searchService.SearchPostsAsync(query, postParams);
             return Ok(posts);
         }
 
         [HttpGet("recipes")]
-        public async Task<IActionResult> SearchRecipes([FromQuery] string query, [FromQuery] RecipeParams recipeParams)
+        public async Task<IActionResult> SearchRecipes([FromQuery] string query, [FromQuery] DiyetPlatform.Core.Common.RecipeParams recipeParams)
         {
             var recipes = await _searchService.SearchRecipesAsync(query, recipeParams);
             return Ok(recipes);

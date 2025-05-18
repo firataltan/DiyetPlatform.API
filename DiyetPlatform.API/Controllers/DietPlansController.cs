@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using DiyetPlatform.API.Models.DTOs.DietPlan;
-using DiyetPlatform.API.Services;
-using DiyetPlatform.API.Helpers;
+using DiyetPlatform.Application.DTOs.DietPlan;
+using DiyetPlatform.Application.Interfaces;
+using DiyetPlatform.Application.Common.Parameters;
 
 namespace DiyetPlatform.API.Controllers
 {
@@ -46,7 +46,7 @@ namespace DiyetPlatform.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateDietPlan([FromBody] DietPlanCreateDto dietPlanDto)
         {
-            var userId = int.Parse(User.FindFirst("userId")?.Value);
+            var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
             var dietPlan = await _dietPlanService.CreateDietPlanAsync(userId, dietPlanDto);
 
             return CreatedAtAction(nameof(GetDietPlan), new { id = dietPlan.Id }, dietPlan);
@@ -56,7 +56,7 @@ namespace DiyetPlatform.API.Controllers
         [HttpPost("user/{userId}")]
         public async Task<IActionResult> CreateDietPlanForUser(int userId, [FromBody] DietPlanCreateDto dietPlanDto)
         {
-            var dietitianId = int.Parse(User.FindFirst("userId")?.Value);
+            var dietitianId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
             
             // Diyetisyen rolü kontrolü
             if (!User.IsInRole("Dietitian"))
@@ -74,7 +74,7 @@ namespace DiyetPlatform.API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateDietPlan(int id, [FromBody] DietPlanCreateDto dietPlanDto)
         {
-            var userId = int.Parse(User.FindFirst("userId")?.Value);
+            var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
             var result = await _dietPlanService.UpdateDietPlanAsync(userId, id, dietPlanDto);
             
             if (!result.Success)
@@ -87,7 +87,7 @@ namespace DiyetPlatform.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDietPlan(int id)
         {
-            var userId = int.Parse(User.FindFirst("userId")?.Value);
+            var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
             var result = await _dietPlanService.DeleteDietPlanAsync(userId, id);
             
             if (!result.Success)

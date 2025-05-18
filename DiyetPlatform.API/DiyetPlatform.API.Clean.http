@@ -1,0 +1,6 @@
+@DiyetPlatform.API.Clean_HostAddress = http://localhost:5161
+
+GET {{DiyetPlatform.API.Clean_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

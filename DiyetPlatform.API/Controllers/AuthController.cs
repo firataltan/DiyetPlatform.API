@@ -1,5 +1,5 @@
-﻿using DiyetPlatform.API.Models.DTOs.Auth;
-using DiyetPlatform.API.Services;
+﻿using DiyetPlatform.Application.DTOs.Auth;
+using DiyetPlatform.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiyetPlatform.API.Controllers
@@ -29,10 +29,33 @@ namespace DiyetPlatform.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto loginDto)
         {
-            var result = await _authService.LoginAsync(loginDto);
+            var result = await _authService.LoginAsync(loginDto.Email, loginDto.Password);
 
             if (!result.Success)
                 return Unauthorized(result.Message);
+
+            return Ok(result);
+        }
+
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword(ChangePasswordDto changePasswordDto)
+        {
+            var userId = int.Parse(User.FindFirst("nameidentifier")?.Value);
+            var result = await _authService.ChangePasswordAsync(userId, changePasswordDto.CurrentPassword, changePasswordDto.NewPassword);
+
+            if (!result.Success)
+                return BadRequest(result.Message);
+
+            return Ok(result);
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordDto forgotPasswordDto)
+        {
+            var result = await _authService.ResetPasswordAsync(forgotPasswordDto.Email);
+
+            if (!result.Success)
+                return BadRequest(result.Message);
 
             return Ok(result);
         }
